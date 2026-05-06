@@ -1,3 +1,5 @@
+import SpendForm from "@/components/SpendForm";
+
 export default function Home() {
   return (
     <main className="p-6 max-w-4xl mx-auto">
@@ -8,7 +10,7 @@ export default function Home() {
         Get an instant audit of your AI stack and see how much you can save.
       </p>
 
-      {/* Form goes here */}
+      <SpendForm/>
     </main>
   );
 }
