@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { useAuditStore } from "@/store/useAuditStore";
-import { AuditInput,ToolInput,ToolName } from "@/types";
+import { AuditInput,ToolInput } from "@/types";
+import { useRouter } from "next/navigation";
 
 export default function SpendForm() {
   const { setData } = useAuditStore();
+  const router = useRouter();
 
   const [tools, setTools] = useState<ToolInput[]>([
     {
@@ -43,13 +45,11 @@ export default function SpendForm() {
     const data: AuditInput = {
       tools,
       teamSize,
-      useCase: useCase as any,
+      useCase,
     };
 
     setData(data);
-
-    // temporary: log instead of routing
-    console.log("Submitted:", data);
+    router.push("/results");
   };
 
   return (
