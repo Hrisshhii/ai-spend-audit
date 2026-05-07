@@ -44,8 +44,14 @@ export default function ResultsPage() {
                 {result.tool}
               </h3>
 
-              <div className="text-green-400 font-bold">
-                Save ${result.savings}/mo
+              <div className="text-right">
+                <div className="text-green-400 font-bold text-xl">
+                  ${result.savings}/mo
+                </div>
+
+                <div className="text-gray-500 text-sm">
+                  ${result.savings * 12}/year
+                </div>
               </div>
             </div>
 
