@@ -65,6 +65,9 @@ export default function SpendForm() {
           >
             <option value="chatgpt">ChatGPT</option>
             <option value="claude">Claude</option>
+            <option value="copilot">GitHub Copilot</option>
+            <option value="gemini">Gemini</option>
+            <option value="cursor">Cursor</option>
           </select>
 
           <select value={tool.plan} className="mr-2"

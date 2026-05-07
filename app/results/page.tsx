@@ -6,6 +6,7 @@ import { runAudit } from "@/lib/auditEngine";
 export default function ResultsPage() {
   const { data } = useAuditStore();
   const audit = runAudit(data);
+  const isOptimized = audit.totalMonthlySavings < 100;
 
   return (
     <main className="max-w-5xl mx-auto p-6">
@@ -31,6 +32,28 @@ export default function ResultsPage() {
           ${audit.totalAnnualSavings}/year
         </div>
       </div>
+
+      {isOptimized ? (
+        <div className="border border-green-700 bg-green-950 p-4 rounded-xl mb-8">
+          <p className="text-green-300 font-medium">
+            Your stack already looks fairly optimized.
+          </p>
+
+          <p className="text-gray-400 mt-1">
+            We’ll notify you when better pricing or optimization opportunities appear.
+          </p>
+        </div>
+      ) : (
+        <div className="border border-blue-700 bg-blue-950 p-4 rounded-xl mb-8">
+          <p className="text-blue-300 font-medium">
+            Significant savings opportunity detected.
+          </p>
+
+          <p className="text-gray-400 mt-1">
+            Credex may help reduce your AI infrastructure costs further through discounted credits.
+          </p>
+        </div>
+      )}
 
       {/* TOOL RESULTS */}
       <div className="space-y-4">
