@@ -1,14 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { runAudit } from "@/lib/auditEngine";
 
 export default function SharedAuditPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id } = use(params);
   const [audit, setAudit] = useState<any>(null);
+
+  const [email, setEmail] = useState("");
+  const [company, setCompany] = useState("");
+  const [role, setRole] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+
+  const calculatedAudit = audit
+  ? runAudit({
+      tools: audit.tools,
+      teamSize: audit.team_size,
+      useCase: audit.use_case,
+    })
+  : null;
 
   useEffect(() => {
     fetchAudit();
@@ -18,7 +33,7 @@ export default function SharedAuditPage({
     const { data, error } = await supabase
       .from("audits")
       .select("*")
-      .eq("id", params.id)
+      .eq("id", id)
       .single();
 
     if (error) {
@@ -27,6 +42,24 @@ export default function SharedAuditPage({
     }
 
     setAudit(data);
+  };
+
+  const submitLead = async () => {
+    const { error } = await supabase
+      .from("audits")
+      .update({
+        email,
+        company_name: company,
+        role,
+      })
+      .eq("id", id);
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setSubmitted(true);
   };
 
   if (!audit) {
@@ -45,11 +78,43 @@ export default function SharedAuditPage({
 
       <div className="border rounded-xl p-6 bg-zinc-900 mb-8">
         <div className="text-5xl font-bold text-green-400">
-          ${audit.total_monthly_savings}/mo
+          ${calculatedAudit?.totalMonthlySavings}/mo
         </div>
 
         <div className="text-gray-400 mt-2">
-          ${audit.total_annual_savings}/year
+          ${calculatedAudit?.totalAnnualSavings}/year
+        </div>
+      </div>
+
+      <div className="border rounded-xl p-6 bg-zinc-900 mb-8">
+        <h2 className="text-2xl font-semibold mb-4">
+          Get Full Report
+        </h2>
+
+        <div className="space-y-3">
+          <input placeholder="Email" value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full bg-black border border-zinc-700 p-3 rounded"
+          />
+
+          <input placeholder="Company Name" value={company}
+            onChange={(e) => setCompany(e.target.value)}
+            className="w-full bg-black border border-zinc-700 p-3 rounded"
+          />
+
+          <input placeholder="Role" value={role}
+            onChange={(e) => setRole(e.target.value)}
+            className="w-full bg-black border border-zinc-700 p-3 rounded"
+          />
+
+          <button className="bg-blue-600 px-5 py-3 rounded" onClick={submitLead}>
+            Unlock Full Report
+          </button>
+          {submitted && (
+            <p className="text-green-400 mt-3">
+              Report captured successfully.
+            </p>
+          )}
         </div>
       </div>
 

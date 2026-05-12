@@ -3,20 +3,27 @@
 import { useAuditStore } from "@/store/useAuditStore";
 import { runAudit } from "@/lib/auditEngine";
 import { supabase } from "@/lib/supabase";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { generateSummary } from "@/lib/generateSummary";
 
 export default function ResultsPage() {
   const { data } = useAuditStore();
   const router = useRouter();
   const audit = runAudit(data);
+  const [saved, setSaved] = useState(false);
   const isOptimized = audit.totalMonthlySavings < 100;
 
+  const summary = generateSummary(
+    audit.totalMonthlySavings,
+    audit.results.length
+  );
+
   useEffect(() => {
-    if (data.tools.length > 0) {
+    if (data.tools.length > 0 && !saved) {
       saveAudit();
     }
-  }, []);
+  }, [saved]);
 
   const saveAudit = async () => {
     const { data: savedAudit, error } = await supabase
@@ -41,9 +48,8 @@ export default function ResultsPage() {
       console.error(error);
       return;
     }
-
+    setSaved(true);
     console.log(savedAudit);
-
     router.push(`/results/${savedAudit.id}`);
   };
 
@@ -70,6 +76,16 @@ export default function ResultsPage() {
         <div className="text-gray-400 mt-2">
           ${audit.totalAnnualSavings}/year
         </div>
+      </div>
+
+      <div className="border rounded-xl p-6 mb-8 bg-zinc-900">
+        <h2 className="text-2xl font-semibold mb-3">
+          AI-Generated Summary
+        </h2>
+
+        <p className="text-gray-300 leading-relaxed">
+          {summary}
+        </p>
       </div>
 
       {isOptimized ? (

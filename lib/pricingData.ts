@@ -17,4 +17,8 @@ export const pricing = {
     pro: 20,
     ultra: 30,
   },
+  copilot: {
+    individual: 10,
+    business: 19,
+  },
 };
