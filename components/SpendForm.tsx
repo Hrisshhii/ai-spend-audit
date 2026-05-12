@@ -5,6 +5,14 @@ import { useAuditStore } from "@/store/useAuditStore";
 import { AuditInput,ToolInput } from "@/types";
 import { useRouter } from "next/navigation";
 
+const planOptions: Record<string, string[]> = {
+  chatgpt: ["plus", "team", "enterprise"],
+  claude: ["pro", "team"],
+  cursor: ["pro", "business"],
+  copilot: ["individual", "business"],
+  gemini: ["pro", "ultra"],
+};
+
 export default function SpendForm() {
   const { setData } = useAuditStore();
   const router = useRouter();
@@ -73,9 +81,11 @@ export default function SpendForm() {
           <select value={tool.plan} className="mr-2"
             onChange={(e) => handleChange(index, "plan", e.target.value)}
           >
-            <option value="plus">Plus</option>
-            <option value="team">Team</option>
-            <option value="pro">Pro</option>
+            {planOptions[tool.tool]?.map((plan) => (
+              <option key={plan} value={plan}>
+                {plan}
+              </option>
+            ))}
           </select>
 
           <input type="number" value={tool.monthlySpend} className="mr-2 w-24"
