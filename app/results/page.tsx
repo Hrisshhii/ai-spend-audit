@@ -2,11 +2,50 @@
 
 import { useAuditStore } from "@/store/useAuditStore";
 import { runAudit } from "@/lib/auditEngine";
+import { supabase } from "@/lib/supabase";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function ResultsPage() {
   const { data } = useAuditStore();
+  const router = useRouter();
   const audit = runAudit(data);
   const isOptimized = audit.totalMonthlySavings < 100;
+
+  useEffect(() => {
+    if (data.tools.length > 0) {
+      saveAudit();
+    }
+  }, []);
+
+  const saveAudit = async () => {
+    const { data: savedAudit, error } = await supabase
+      .from("audits")
+      .insert([
+        {
+          tools: data.tools,
+          team_size: data.teamSize,
+          use_case: data.useCase,
+
+          total_monthly_savings:
+            audit.totalMonthlySavings,
+
+          total_annual_savings:
+            audit.totalAnnualSavings,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    console.log(savedAudit);
+
+    router.push(`/results/${savedAudit.id}`);
+  };
 
   return (
     <main className="max-w-5xl mx-auto p-6">
