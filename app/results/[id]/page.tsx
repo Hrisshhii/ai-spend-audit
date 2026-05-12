@@ -22,8 +22,7 @@ export default function SharedAuditPage({
       tools: audit.tools,
       teamSize: audit.team_size,
       useCase: audit.use_case,
-    })
-  : null;
+    }) : null;
 
   useEffect(() => {
     fetchAudit();
